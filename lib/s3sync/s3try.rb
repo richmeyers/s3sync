@@ -82,8 +82,10 @@ module S3sync
           $stderr.puts "Connection timed out: #{e}"
         end
         $S3syncRetriesLeft -= 1
-        $stderr.puts "#{$S3syncRetriesLeft} retries left, sleeping for #{$S3SYNC_WAITONERROR} seconds"
-        Kernel.sleep $S3SYNC_WAITONERROR.to_i
+        if $S3syncRetriesLeft > 0
+          $stderr.puts "#{$S3syncRetriesLeft} retries left, sleeping for #{$S3SYNC_WAITONERROR} seconds"
+          Kernel.sleep $S3SYNC_WAITONERROR.to_i
+        end
       end
     end
 
@@ -154,8 +156,10 @@ module S3sync
         debug("No result available")
       end
       $S3syncRetriesLeft -= 1
-      $stderr.puts "#{$S3syncRetriesLeft} retries left, sleeping for #{$S3SYNC_WAITONERROR} seconds" unless hush
-      Kernel.sleep $S3SYNC_WAITONERROR.to_i unless now
+      if $S3syncRetriesLeft > 0
+        $stderr.puts "#{$S3syncRetriesLeft} retries left, sleeping for #{$S3SYNC_WAITONERROR} seconds" unless hush
+        Kernel.sleep $S3SYNC_WAITONERROR.to_i unless now
+      end
     end
     if $S3syncRetriesLeft <= 0
       $stderr.puts "Ran out of retries; operations did not complete!"
